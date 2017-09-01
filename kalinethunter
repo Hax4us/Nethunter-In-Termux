@@ -1,6 +1,11 @@
 #!/data/data/com.termux/files/usr/bin/bash
 clear
 echo
+DIRECTORY="/data/data/com.termux/files/usr/share/figlet"
+if [ ! -d "$DIRECTORY" ]; then
+apt update && apt install figlet
+fi
+figlet -f mini ........KALI-NETHUNTER-NO-ROOT........
 echo ". ------------Hello This Is Hax4us (devil)-----------"
 echo
 echo
