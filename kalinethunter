@@ -28,7 +28,7 @@ echo "installed successfully.... :D"
 echo
 echo "Now Kali Nethunter Is Installing......."
 echo
-wget https://build.nethunter.com/kalifs/kalifs-latest/kalifs-arm64-full.tar.xz
+wget https://build.nethunter.com/kalifs/kalifs-20170201/kalifs-arm64-full.tar.xz
 echo
 proot --link2symlink tar -xf kalifs-arm64-full.tar.xz
 cd kali-arm64 && echo "nameserver 8.8.8.8" > etc/resolv.conf
