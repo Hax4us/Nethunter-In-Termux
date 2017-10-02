@@ -37,6 +37,7 @@ cd ../ && echo "proot --link2symlink -0 -r kali-arm64 -b /dev/ -b /sys/ -b /proc
 
 chmod 777 startkali.sh && termux-fix-shebang startkali.sh
 echo
+cd $HOME/Nethunter-In-Termux && chmod -R 777 kali-arm64
 echo "Now You Can Start Kali Linux (Nethunter) By :--> ./startkali.sh"
 echo
 ;;
