@@ -33,7 +33,8 @@ echo
 proot --link2symlink bsdtar -xf kalifs-arm64-full.tar.xz
 cd kali-arm64 && echo "nameserver 8.8.8.8" > etc/resolv.conf
 
-cd ../ && echo "unset LD_PRELOAD proot --link2symlink -0 -r kali-arm64 -b /dev/ -b /sys/ -b /proc/ -b /data/data/com.termux/files/home -b /system -b /mnt /usr/bin/env -i HOME=/root PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games TERM=$TERM /bin/bash --login" > startkali.sh
+cd .. && echo "unset LD_PRELOAD" > startkali.sh
+echo "proot --link2symlink -0 -r kali-arm64 -b /dev/ -b /sys/ -b /proc/ -b /data/data/com.termux/files/home -b /system -b /mnt /usr/bin/env -i HOME=/root PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games TERM=$TERM /bin/bash --login" > startkali.sh
 
 chmod 777 startkali.sh && termux-fix-shebang startkali.sh
 echo
@@ -54,8 +55,9 @@ wget https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-armhf-minimal.tar
 echo
 proot --link2symlink bsdtar -xf kalifs-armhf-minimal.tar.xz
 cd kali-armhf && echo "nameserver 8.8.8.8" > etc/resolv.conf
+cd .. && echo "unset LD_PRELOAD" > startkali.sh
 
-cd ../ && echo "unset LD_PRELOAD proot --link2symlink -0 -r kali-armhf -b /dev/ -b /sys/ -b /proc/ -b /data/data/com.termux/files/home -b /system -b /mnt /usr/bin/env -i HOME=/root PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games TERM=$TERM /bin/bash --login" > startkali.sh
+echo "proot --link2symlink -0 -r kali-armhf -b /dev/ -b /sys/ -b /proc/ -b /data/data/com.termux/files/home -b /system -b /mnt /usr/bin/env -i HOME=/root PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games TERM=$TERM /bin/bash --login" > startkali.sh
 
 chmod 777 startkali.sh && termux-fix-shebang startkali.sh
 echo
@@ -77,7 +79,8 @@ echo
 proot --link2symlink bsdtar -xf kalifs-arm64-minimal.tar.xz
 cd kali-arm64 && echo "nameserver 8.8.8.8" > etc/resolv.conf
 
-cd ../ && echo "unset LD_PRELOAD proot --link2symlink -0 -r kali-arm64 -b /dev/ -b /sys/ -b /proc/ -b /data/data/com.termux/files/home -b /system -b /mnt /usr/bin/env -i HOME=/root PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games TERM=$TERM /bin/bash --login" > startkali.sh
+ cd .. && echo "unset LD_PRELOAD" > startkali.sh
+echo "proot --link2symlink -0 -r kali-arm64 -b /dev/ -b /sys/ -b /proc/ -b /data/data/com.termux/files/home -b /system -b /mnt /usr/bin/env -i HOME=/root PATH=/usr/local/sbin:/usr/local/bin:/bin:/usr/bin:/sbin:/usr/sbin:/usr/games:/usr/local/games TERM=$TERM /bin/bash --login" > startkali.sh
 
 chmod 777 startkali.sh && termux-fix-shebang startkali.sh
 echo
