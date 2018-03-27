@@ -16,17 +16,6 @@ reset='\033[0m'
 urlaarch64="https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-arm64-minimal.tar.xz"
 urlarm="https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-armhf-minimal.tar.xz"
 
-
-# Destination
-
-if [ -d $HOME/kali ]
-	then
-		rm -rf $HOME/kali
-DESTINATION=$HOME/kali
-else
-	DESTINATION=$HOME/TermuxAlpine
-	fi
-cd $DESTINATION
 printrerunerror="Sorry :( to say your downloaded linux file was corrupted or half downloaded but dont worry just rerun my script"
 
 # utility function to initialize arch
