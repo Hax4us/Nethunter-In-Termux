@@ -179,12 +179,12 @@ checkdeps() {
 		exit
 		fi
 		fi
-	if [ -e $PREFIX/bin/curl ]
+	if [ -e $PREFIX/bin/axel ]
 		then
-			echo "  • Curl is OK"
+			echo "  • Axel is OK"
 		else
-			apt install curl -y &> /dev/null
-			if [ ! -e $PREFIX/bin/curl ]
+			apt install axel -y &> /dev/null
+			if [ ! -e $PREFIX/bin/axel ]
 				then
 	printf "$red"
 	echo " ERROR : check your internet connection or apt "
@@ -206,10 +206,10 @@ getsha() {
 	echo
 	if [ $SETARCH = "aarch64" ]
 		then
-		curl --progress-bar -L --fail --retry 4 -O https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-arm64-minimal.sha512sum
+      axel https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-arm64-minimal.sha512sum
 	elif [ $SETARCH = "armhf" ]
 		then
-	curl --progress-bar -L --fail --retry 4 -O https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-armhf-minimal.sha512sum
+	 axel https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-armhf-minimal.sha512sum
 	else 
 		printf "$red Your phone is supported but cant download SHA file plz contact to lokesh@hax4us.com $reset"
 		exit
@@ -272,7 +272,7 @@ echo
 printf "$blue [*] Checking host architecture ..."
 checksysinfo
 printf "$blue [*] Configuring Nethunter For You ..."
-cd $HOME && finalwork
+#cd $HOME && finalwork
 printf "$blue"
 echo
 echo
