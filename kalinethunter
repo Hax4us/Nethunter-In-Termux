@@ -127,7 +127,7 @@ chmod 700 $bin
 # Utility function for resolv.conf
 resolvconf() {
 #create resolv.conf file 
-printf "\n nameserver 8.8.8.8\n nameserver 8.8.4.4" > $HOME/kali/etc/resolv.conf
+printf "\nnameserver 8.8.8.8\nnameserver 8.8.4.4" > $HOME/kali/etc/resolv.conf
 }
 
 # Utility function to extract tar file
