@@ -18,6 +18,12 @@ urlarm="https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-armhf-minimal.
 
 printrerunerror="Sorry :( to say your downloaded linux file was corrupted or half downloaded but dont worry just rerun my script"
 
+# Get patched proot binary for aarch64
+
+proot_aarch64() {
+	axel https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot
+	mv proot $PREFIX/bin
+}
 # utility function to initialize arch
 
 getarch() {
@@ -96,6 +102,7 @@ checksysinfo() {
 	if [ $(getprop ro.product.cpu.abi) = "arm64-v8a" ]
 		then
 			checkdeps
+			proot_aarch64
 			getarch aarch64
 			gettarfile
 		elif [ $(getprop ro.product.cpu.abi) = "armeabi" ]; then 
