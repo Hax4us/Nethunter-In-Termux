@@ -16,8 +16,6 @@ reset='\033[0m'
 
 DESTINATION=${HOME}/kali
 [ -d $DESTINATION ] && rm -rf $DESTINATION
-mkdir $DESTINATION
-cd $DESTINATION
 
 # Clean up
 
@@ -122,6 +120,7 @@ checkintegrity() {
 extract() {
 	printf "$blue [*] Extracting... $reset\n\n"
 	proot --link2symlink -0 bsdtar -xpf $rootfs 2> /dev/null || :
+	mv $HOME/kali-${SETARCH} ${DESTINATION}
 }
 
 # Utility function for login file
