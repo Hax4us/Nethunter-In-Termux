@@ -19,7 +19,11 @@ DESTINATION=${HOME}/kali
 mkdir $DESTINATION
 cd $DESTINATION
 
+# Clean up
 
+cleanup() {
+	find $HOME -name "*minimal.tar.xz" -type f -delete && find $HOME -name "*minimal.tar.xz.st" -type f -delete
+} 
 # Get patched proot binary for aarch64
 
 proot_aarch64() {
@@ -151,7 +155,7 @@ clear
 #		fi
 #		fi
 printf "\n${yellow} You are going to install Kali Nethunter In Termux Without Root ;) Cool\n\n"
-
+cleanup
 checksysinfo
 checkdeps
 gettarfile
@@ -159,6 +163,7 @@ getsha
 checkintegrity
 extract
 createloginfile
+cleanup
 
 printf "$blue [*] Configuring Kali For You ..."
 
