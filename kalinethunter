@@ -47,7 +47,6 @@ checksysinfo() {
 	case $(getprop ro.product.cpu.abi) in
 		arm64-v8a)
 			SETARCH=arm64
-			proot_aarch64
 			;;
 		armeabi|armeabi-v7a)
 			SETARCH=armhf
@@ -160,6 +159,10 @@ checkdeps
 gettarfile
 getsha
 checkintegrity
+if [ $SETARCH = arm64 ] 
+	then
+		proot_aarch64
+		fi
 extract
 createloginfile
 cleanup
