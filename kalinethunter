@@ -11,81 +11,23 @@ yellow='\033[1;33m'
 blue='\033[1;34m'
 reset='\033[0m'
 
-#  url's of all possibls architectures
 
-urlaarch64="https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-arm64-minimal.tar.xz"
-urlarm="https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-armhf-minimal.tar.xz"
+# Destination
 
-printrerunerror="Sorry :( to say your downloaded linux file was corrupted or half downloaded but dont worry just rerun my script"
+DESTINATION=${HOME}/kali
+[ -d $DESTINATION ] && rm -rf $DESTINATION
+mkdir $DESTINATION
+cd $DESTINATION
+
 
 # Get patched proot binary for aarch64
 
 proot_aarch64() {
-	axel https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot
-	mv proot $PREFIX/bin
-	chmod 777 $PREFIX/bin/proot
-}
-# utility function to initialize arch
-
-getarch() {
-	SETARCH=$1
-}
-
-# Utility function to check integrity
-
-checkintegrity() {
-	integritycheck=PASS
-	echo
-	printf "$blue [*] Checking integrity of file ..."
-	echo
-	echo " [*] Script will be terminate immediately in case of integrity failure"
-	if [ $SETARCH = "aarch64" ]
-		then
-	sha512sum -c kalifs-arm64-minimal.sha512sum && echo || integritycheck=FAIL
-	if [ $integritycheck = "FAIL" ] 
-		then
-			printf "$red $printrerunerror $reset"
-			exit
-		else
-			extract
-		fi
-			elif [ $SETARCH = "armhf" ]
-				then
-		sha512sum -c kalifs-armhf-minimal.sha512sum && echo "" || integritycheck=FAIL
-		if [ $integritycheck = "FAIL" ]
-			then
-				printf"$red $printrerunerror $reset"
-				exit
-			else
-			extract
-				fi
-
-			fi
-}
-
-# Utility function to get tar file
-
-gettarfile() {
-	cd $HOME
-	printf "$blue [*] Getting tar file ...$reset"
-	echo
-	if [ $SETARCH = "aarch64" ]
-		then
-			URL=$urlaarch64	
-		echo
-axel $URL
-		getsha
-			checkintegrity
-	
-elif [ $SETARCH = "armhf" ]
-		then
-			URL=$urlarm
-		echo
-axel $URL
-			getsha
-			checkintegrity
-fi
-}
+	echo && echo
+		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot
+			mv proot $PREFIX/bin
+				chmod 777 $PREFIX/bin/proot
+			}
 
 # Utility function for Unknown Arch
 
@@ -99,173 +41,102 @@ unknownarch() {
 # Utility function for detect system
 
 checksysinfo() {
-
-	if [ $(getprop ro.product.cpu.abi) = "arm64-v8a" ]
-		then
-			checkdeps
+	printf "$blue [*] Checking host architecture ..."
+	case $(getprop ro.product.cpu.abi) in
+		arm64-v8a)
+			SETARCH=arm64
 			proot_aarch64
-			getarch aarch64
-			gettarfile
-		elif [ $(getprop ro.product.cpu.abi) = "armeabi" ]; then 
-			checkdeps
-			getarch armhf
-			gettarfile
-		elif [ $(getprop ro.product.cpu.abi) = "armeabi-v7a" ]; then
-    		checkdeps
-			getarch armhf
-			gettarfile
-		else
+			;;
+		armeabi|armeabi-v7a)
+			SETARCH=armhf
+			;;
+		*)
 			unknownarch
-		fi
-	}
-
-# Utility function for login file
-
-createloginfile() {
-bin=$PREFIX/bin/startkali
-	cat > $bin <<- EOM
-		#!/data/data/com.termux/files/usr/bin/bash -e
-			unset LD_PRELOAD
-				exec proot --link2symlink -0 -r $HOME/kali/ -b /dev/ -b /sys/ -b /proc/ -b /storage/ -b $HOME -w $HOME /usr/bin/env -i HOME=/root TERM="$TERM" LANG=$LANG PATH=/bin:/usr/bin:/sbin:/usr/sbin /bin/bash --login
-				EOM
-chmod 700 $bin
-
+			;;
+	esac
 }
 
-# Utility function for resolv.conf
-resolvconf() {
-#create resolv.conf file 
-printf "\nnameserver 8.8.8.8\nnameserver 8.8.4.4" > $HOME/kali/etc/resolv.conf
-}
-
-# Utility function to extract tar file
-
-extract() {
-	printf "$blue [*] Extracting ... $reset"
-	echo
-	if [ $SETARCH = aarch64 ]; then
-		OUTPUT=kalifs-arm64-minimal.tar.xz
-		cd $HOME && proot --link2symlink -0 bsdtar -xpf $OUTPUT 2> /dev/null || : 
-		mv kali-arm64 kali
-
-
-	else
-		OUTPUT=kalifs-armhf-minimal.tar.xz
-               cd $HOME && proot --link2symlink -0 bsdtar -xpf $OUTPUT 2> /dev/null || :
-	       mv kali-armhf kali
-		fi
-createloginfile
-resolvconf
-}
+# Check if required packages are present
 
 checkdeps() {
-	printf "$blue \n"
-	echo " [*] Updating termux ..."
+	printf "${blue}\n"
+	echo " [*] Updating apt cache..."
 	apt update -y &> /dev/null
-	echo " [*] Checking all required tools ..."
-	if [ -e $PREFIX/bin/proot ]
-		then
-			echo "  • Proot is OK"
-		else
-			apt install proot -y &> /dev/null
-	if [ ! -e $PREFIX/bin/proot ]
-		then
-			printf "$red \n"
-		echo " ERROR : check your internet connection or apt"
-		printf "\n"
-		echo " Exiting ..."
-		printf "$reset"
-		exit
-		fi
-	
-			fi
-	if [ -e $PREFIX/bin/bsdtar ]
-		then
-			echo "  • Bsdtar is Ok"
-		else
-			apt install bsdtar -y &> /dev/null
-			if [ ! -e $PREFIX/bin/bsdtar ]
-				then
-					printf "$red"
-		echo " ERROR : check your internet connection or apt"
-		echo " [*] Exiting ..."
-		printf "$reset"
-		sleep 1
-		exit
-		fi
-		fi
-	if [ -e $PREFIX/bin/axel ]
-		then
-			echo "  • Axel is OK"
-		else
-			apt install axel -y &> /dev/null
-			if [ ! -e $PREFIX/bin/axel ]
-				then
-	printf "$red"
-	echo " ERROR : check your internet connection or apt "
+	echo " [*] Checking for all required tools..."
 
-  echo " Exiting ..."
-  printf "$reset"
-exit
-				fi
-				fi
+	for i in proot bsdtar axel; do
+		if [ -e $PREFIX/bin/$i ]; then
+			echo "  • $i is OK"
+		else
+			echo "Installing ${i}..."
+			apt install -y $i || {
+				printf "$red"
+				echo " ERROR: check your internet connection or apt\n Exiting..."
+				printf "$reset"
+				exit
+			}
+		fi
+	done
+}
+
+# URLs of all possibls architectures
+
+seturl() {
+	URL="https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${1}-minimal.tar.xz"
+}
+
+# Utility function to get tar file
+
+gettarfile() {
+	printf "$blue [*] Getting tar file...$reset\n\n"
+	seturl $SETARCH
+	axel --alternate "$URL"
+	rootfs="kalifs-${SETARCH}-minimal.tar.xz"
 }
 
 # Utility function to get SHA
 
 getsha() {
-	echo
-	printf "$blue [*] Getting SHA ... $reset"
-
-	echo
-	echo
-	if [ $SETARCH = "aarch64" ]
-		then
-      axel https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-arm64-minimal.sha512sum
-	elif [ $SETARCH = "armhf" ]
-		then
-	 axel https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-armhf-minimal.sha512sum
-	else 
-		printf "$red Your phone is supported but cant download SHA file plz contact to lokesh@hax4us.com $reset"
-		exit
-	fi
-
+	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
+	axel --alternate "https://build.nethunter.com/kalifs/kalifs-201kalifs-${SETARCH}-minimal.sha512sum"
 }
 
-# Utility function to touchup (under construction)
+# Utility function to check integrity
 
-#finalwork() {
-#	if [ ! -e $HOME/finaltouchup.sh ] 
-#		then
-#	
-#	curl -LO https://raw.githubusercontent.com/Hax4us/TermuxAlpine/master/finaltouchup.sh
-#	. finaltouchup.sh
-#else
-#	. finaltouchup.sh
-#	fi
-#}
+checkintegrity() {
+	printf "\n${blue} [*] Checking integrity of file...\n"
+	echo " [*] The script will immediately terminate in case of integrity failure"
+	printf ' '
+	sha512sum -c kalifs-${SETARCH}-minimal.sha512sum || {
+		printf "$red Sorry :( to say your downloaded linux file was corrupted or half downloaded, but don't worry, just rerun my script\n${reset}"
+		exit 1
+	}
+}
 
-# Utility function for cleanup
+# Utility function to extract tar file
 
-#cleanup() {
-#	if [ -d $DESTINATION ]
-#		then
-#	rm -rf $DESTINATION
-#else
-#	printf "$red not installed so not removed"
-#	echo
-#	fi
-#	if [ -e $PREFIX/bin/startalpine ]
-#		then
-#	rm $PREFIX/bin/startalpine
-#	printf "$yellow uninstalled :) $reset"
-#	echo
-#else
-#	printf "$red not installed so not removed $reset"
-#	echo
-#	fi
+extract() {
+	printf "$blue [*] Extracting... $reset\n\n"
+	proot --link2symlink -0 bsdtar -xpf $rootfs 2> /dev/null || :
+}
 
-#}
+# Utility function for login file
+
+createloginfile() {
+	bin=${PREFIX}/bin/startkali
+	cat > $bin <<- EOM
+#!/data/data/com.termux/files/usr/bin/bash -e
+unset LD_PRELOAD
+exec proot --link2symlink -0 -r ${DESTINATION} -b /dev/ -b /sys/ -b /proc/ -b /storage/ -b $HOME -w $HOME /usr/bin/env -i HOME=/root TERM="$TERM" LANG=$LANG PATH=/bin:/usr/bin:/sbin:/usr/sbin /bin/sh --login
+EOM
+
+	chmod 700 $bin
+}
+
+printline() {
+	printf "${blue}\n"
+	echo " #-----------------------------------------------#"
+}
 
 # Start
 clear
@@ -279,26 +150,30 @@ clear
 #		exit
 #		fi
 #		fi
-echo
-printf "$yellow You are going to install Kali Nethunter in termux ;) Cool"
-echo
-echo
-echo
-printf "$blue [*] Checking host architecture ..."
+printf "\n${yellow} You are going to install Kali Nethunter In Termux Without Root ;) Cool\n\n"
+
 checksysinfo
-printf "$blue [*] Configuring Nethunter For You ..."
-#cd $HOME && finalwork
-printf "$blue"
-echo
-echo
-echo " #-----------------------------------------------#"
-echo
-printf "$blue [∆] My Official Mail : $yellow lokesh@hax4us.com"
-echo
-printf "$blue [∆] My Website       : $yellow https://hax4us.com"
-echo
-printf "$blue [∆] My Channel       : $yellow https://youtube.com/hax4us $reset"
-printf "$blue"
-echo
-echo " #-----------------------------------------------#"
+checkdeps
+gettarfile
+getsha
+checkintegrity
+extract
+createloginfile
+
+printf "$blue [*] Configuring Kali For You ..."
+
+# Utility function for resolv.conf
+resolvconf() {
+	#create resolv.conf file 
+	printf "\nnameserver 8.8.8.8\nnameserver 8.8.4.4" > ${DESTINATION}/etc/resolv.conf
+} 
+resolvconf
+printline
+printf "\n${yellow} Now you can enjoy Kali Nethuter in your Termux :)\n Don't forget to like my hard work for termux and many other things\n"
+printline
+printline
+printf "\n${blue} [∆] My official email:${yellow}		lokesh@hax4us.com\n"
+printf "$blue [∆] My website:${yellow}		https://hax4us.com\n"
+printf "$blue [∆] My YouTube channel:${yellow}	https://youtube.com/hax4us\n"
+printline
 printf "$reset"
