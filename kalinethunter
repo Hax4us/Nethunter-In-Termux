@@ -98,7 +98,7 @@ gettarfile() {
 
 getsha() {
 	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
-	axel --alternate "https://build.nethunter.com/kalifs/kalifs-201kalifs-${SETARCH}-minimal.sha512sum"
+	axel --alternate "https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${SETARCH}-minimal.sha512sum"
 }
 
 # Utility function to check integrity
