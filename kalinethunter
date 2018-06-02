@@ -11,24 +11,18 @@ yellow='\033[1;33m'
 blue='\033[1;34m'
 reset='\033[0m'
 
-
-# Destination
-
-DESTINATION=${HOME}/kali
-[ -d $DESTINATION ] && rm -rf $DESTINATION
-
 # Clean up
 
 cleanup() {
-	find $HOME -name "*minimal.tar.xz" -type f -delete && find $HOME -name "*minimal.tar.xz.st" -type f -delete
+	find $HOME -name "kalifs*" -type f -delete && find $HOME -name "kali*" -type d -exec rm -rf {} \;
 } 
 # Get patched proot binary for aarch64
 
-proot_aarch64() {
+proot_patch() {
 	echo && echo
-		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot
+		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot2
 			mv proot $PREFIX/bin
-				chmod 777 $PREFIX/bin/proot
+				chmod 777 $PREFIX/bin/proot2
 			}
 
 # Utility function for Unknown Arch
@@ -90,6 +84,7 @@ seturl() {
 
 gettarfile() {
 	printf "$blue [*] Getting tar file...$reset\n\n"
+	DESTINATION=kali-${SETARCH}
 	seturl $SETARCH
 	axel --alternate "$URL"
 	rootfs="kalifs-${SETARCH}-minimal.tar.xz"
@@ -118,8 +113,7 @@ checkintegrity() {
 
 extract() {
 	printf "$blue [*] Extracting... $reset\n\n"
-	proot --link2symlink tar -xf $rootfs 2> /dev/null || :
-	mv $HOME/kali-${SETARCH} ${DESTINATION}
+	proot2 --link2symlink tar -xf $rootfs 2> /dev/null || :
 }
 
 # Utility function for login file
@@ -129,7 +123,7 @@ createloginfile() {
 	cat > $bin <<- EOM
 #!/data/data/com.termux/files/usr/bin/bash -e
 unset LD_PRELOAD
-exec proot --link2symlink -0 -r ${DESTINATION} -b /dev/ -b /sys/ -b /proc/ -b /storage/ -b $HOME -w $HOME /usr/bin/env -i HOME=/root TERM="$TERM" LANG=$LANG PATH=/bin:/usr/bin:/sbin:/usr/sbin /bin/bash --login
+exec proot2 --link2symlink -0 -r ${DESTINATION} -b /dev/ -b /sys/ -b /proc/ -b /storage/ -b $HOME -w $HOME /usr/bin/env -i HOME=/root TERM="$TERM" LANG=$LANG PATH=/bin:/usr/bin:/sbin:/usr/sbin /bin/bash --login
 EOM
 
 	chmod 700 $bin
@@ -159,10 +153,7 @@ checkdeps
 gettarfile
 getsha
 checkintegrity
-if [ $SETARCH = arm64 ] 
-	then
-		proot_aarch64
-		fi
+proot_patch
 extract
 createloginfile
 cleanup
