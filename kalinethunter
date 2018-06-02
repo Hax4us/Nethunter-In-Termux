@@ -22,7 +22,7 @@ post_cleanup() {
 
 		# Get patched proot binary for aarch64
 
-proot_patch() {
+proot_patch64() {
 	echo && echo
 		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot2
 			mv proot2 $PREFIX/bin
@@ -157,7 +157,10 @@ checkdeps
 gettarfile
 getsha
 checkintegrity
-proot_patch
+if [ $SETARCH = arm64 ]
+	then
+proot_patch64
+fi
 extract
 createloginfile
 post_cleanup
