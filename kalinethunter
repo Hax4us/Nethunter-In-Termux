@@ -12,11 +12,15 @@ blue='\033[1;34m'
 reset='\033[0m'
 
 # Clean up
-
-cleanup() {
-	find $HOME -name "kalifs*" -type f -delete && find $HOME -name "kali*" -type d -exec rm -rf {} \; && find $HOME -name "proot*" -type f -delete
+pre_cleanup() {
+	find $HOME -name "kali*" -type d -exec rm -rf {} \;
 } 
-# Get patched proot binary for aarch64
+
+post_cleanup() {
+	find $HOME -name "kalifs*" -type f -delete && find $HOME -name "proot*" -type f -delete
+} 
+
+		# Get patched proot binary for aarch64
 
 proot_patch() {
 	echo && echo
@@ -147,7 +151,7 @@ clear
 #		fi
 #		fi
 printf "\n${yellow} You are going to install Kali Nethunter In Termux Without Root ;) Cool\n\n"
-cleanup
+pre_cleanup
 checksysinfo
 checkdeps
 gettarfile
@@ -156,7 +160,7 @@ checkintegrity
 proot_patch
 extract
 createloginfile
-cleanup
+post_cleanup
 
 printf "$blue [*] Configuring Kali For You ..."
 
