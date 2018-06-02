@@ -88,7 +88,7 @@ seturl() {
 
 gettarfile() {
 	printf "$blue [*] Getting tar file...$reset\n\n"
-	DESTINATION=kali-${SETARCH}
+	DESTINATION=$HOME/kali-${SETARCH}
 	seturl $SETARCH
 	axel --alternate "$URL"
 	rootfs="kalifs-${SETARCH}-minimal.tar.xz"
