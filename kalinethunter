@@ -24,9 +24,9 @@ post_cleanup() {
 
 proot_patch64() {
 	echo && echo
-		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot2
-			mv proot2 $PREFIX/bin
-				chmod 777 $PREFIX/bin/proot2
+		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot
+			mv proot $PREFIX/bin
+				chmod 777 $PREFIX/bin/proot
 			}
 
 # Utility function for Unknown Arch
@@ -117,7 +117,7 @@ checkintegrity() {
 
 extract() {
 	printf "$blue [*] Extracting... $reset\n\n"
-	proot2 --link2symlink tar -xf $rootfs 2> /dev/null || :
+	proot --link2symlink tar -xf $rootfs 2> /dev/null || :
 }
 
 # Utility function for login file
@@ -127,7 +127,7 @@ createloginfile() {
 	cat > $bin <<- EOM
 #!/data/data/com.termux/files/usr/bin/bash -e
 unset LD_PRELOAD
-exec proot2 --link2symlink -0 -r ${DESTINATION} -b /dev/ -b /sys/ -b /proc/ -b /storage/ -b $HOME -w $HOME /usr/bin/env -i HOME=/root TERM="$TERM" LANG=$LANG PATH=/bin:/usr/bin:/sbin:/usr/sbin /bin/bash --login
+exec proot --link2symlink -0 -r ${DESTINATION} -b /dev/ -b /sys/ -b /proc/ -b /storage/ -b $HOME -w $HOME /usr/bin/env -i HOME=/root TERM="$TERM" LANG=$LANG PATH=/bin:/usr/bin:/sbin:/usr/sbin /bin/bash --login
 EOM
 
 	chmod 700 $bin
