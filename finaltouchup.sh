@@ -28,11 +28,17 @@ stubs+=('usr/bin/chfn')
 
 addgroups(){
 	grps=()
-	grps=('ssl-cert:x:111')
-	grps=('postgres:x:115')
-	if [ $SETARCH = armhf ];	then
-	grps=('messagebus:x:110')
+	grps+=('ssl-cert:x:111')
+	grps+=('postgres:x:115')
+	if [ $SETARCH = armhf ]; then
+	grps+=('lightdm:x:111')
+	grps+=('messagebus:x:110')
+else
+	grps+=('lightdm:x:112')
 	fi
+	grps+=('rtkit:x:111')
+	grps+=('pulse:x:111')
+
 	for g in ${grps[@]}; do
 		echo "Creating groups $g"
 		sed -i '$ a $g' $DESTINATION/etc/group
@@ -41,6 +47,14 @@ addgroups(){
 
 adduser() {
 	usr=()
+	usr+=('usbmux:x:108:46:Usbmux:/var/lib/usbmux:/bin/bash:/bin:/usr/sbin')
+	if [ $SETARCH = arm64 ]; then
+	usr+=('lightdm:x:107:112::/usr/bin:/usr/sbin:/bin')
+else
+	usr+=('lightdm:x:105:111:/usr/bin:/usr/sbin:/bin')
+	fi
+	usr+=('rtkit:x:111:111::/usr/bin/:/usr/sbin/:/bin')
+	usr+=('pulse:x:111:111::/usr/bin/:/usr/sbin:/bin')
 	if [ $SETARCH = armhf ]; then
 	usr+=('messagebus:x:106:110::/var/run/dbus:/usr/sbin/nologin')
 	fi
