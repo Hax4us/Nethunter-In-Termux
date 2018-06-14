@@ -22,15 +22,22 @@ post_cleanup() {
 
 		# Get patched proot binary for aarch64
 
-proot_patch64() {
-	echo && echo
-		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot
-			mv proot $PREFIX/bin
-				chmod 777 $PREFIX/bin/proot
-			}
+#proot_patch64() {
+#	echo && echo
+#		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot
+#			mv proot $PREFIX/bin
+#				chmod 777 $PREFIX/bin/proot
+#			}
 
 # Utility function for Unknown Arch
 
+#####################
+#    Decide Chroot  #
+#####################
+
+setchroot() {
+	chroot=full
+}
 unknownarch() {
 	printf "$red"
 	echo "[*] Unknown Architecture :("
@@ -81,7 +88,7 @@ checkdeps() {
 # URLs of all possibls architectures
 
 seturl() {
-	URL="https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${1}-minimal.tar.xz"
+	URL="https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${1}-${chroot}.tar.xz"
 }
 
 # Utility function to get tar file
@@ -91,14 +98,14 @@ gettarfile() {
 	DESTINATION=$HOME/kali-${SETARCH}
 	seturl $SETARCH
 	axel --alternate "$URL"
-	rootfs="kalifs-${SETARCH}-minimal.tar.xz"
+	rootfs="kalifs-${SETARCH}-${chroot}.tar.xz"
 }
 
 # Utility function to get SHA
 
 getsha() {
 	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
-	axel --alternate "https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${SETARCH}-minimal.sha512sum"
+	axel --alternate "https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${SETARCH}-${chroot}.sha512sum"
 }
 
 # Utility function to check integrity
@@ -107,7 +114,7 @@ checkintegrity() {
 	printf "\n${blue} [*] Checking integrity of file...\n"
 	echo " [*] The script will immediately terminate in case of integrity failure"
 	printf ' '
-	sha512sum -c kalifs-${SETARCH}-minimal.sha512sum || {
+	sha512sum -c kalifs-${SETARCH}-${chroot}.sha512sum || {
 		printf "$red Sorry :( to say your downloaded linux file was corrupted or half downloaded, but don't worry, just rerun my script\n${reset}"
 		exit 1
 	}
@@ -154,13 +161,10 @@ printf "\n${yellow} You are going to install Kali Nethunter In Termux Without Ro
 pre_cleanup
 checksysinfo
 checkdeps
+setchroot
 gettarfile
 getsha
 checkintegrity
-if [ $SETARCH = arm64 ]
-	then
-proot_patch64
-fi
 extract
 createloginfile
 post_cleanup
@@ -173,6 +177,19 @@ resolvconf() {
 	printf "\nnameserver 8.8.8.8\nnameserver 8.8.4.4" > ${DESTINATION}/etc/resolv.conf
 } 
 resolvconf
+
+################
+# finaltouchup #
+################
+
+finalwork() {
+	[ -e $HOME/finaltouchup.sh ] && rm $HOME/finaltouchup.sh
+	echo
+	axel -a https://github.com/Hax4us/Nethunter-In-Termux/raw/beta/finaltouchup.sh
+	DESTINATION=$DESTINATION SETARCH=$SETARCH bash $HOME/finaltouchup.sh
+} 
+finalwork
+
 printline
 printf "\n${yellow} Now you can enjoy Kali Nethuter in your Termux :)\n Don't forget to like my hard work for termux and many other things\n"
 printline
