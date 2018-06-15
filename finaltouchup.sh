@@ -15,8 +15,8 @@ sym+=('usr/sbin/userdel')
 sym+=('usr/bin/chage')
 sym+=('usr/bin/mesg')  
 sym+=('usr/bin/gpasswd')
-stubs+=('usr/bin/chfn')
- for f in ${stubs[@]};do
+sym+=('usr/bin/chfn')
+ for f in ${sym[@]};do
   echo "Creating symlinks $f"
   ln -sf ${DESTINATION}/bin/true ${DESTINATION}/${f}
   done
@@ -41,7 +41,7 @@ else
 
 	for g in ${grps[@]}; do
 		echo "Creating groups $g"
-		sed -i '$ a $g' $DESTINATION/etc/group
+		sed -i "$ a $g" $DESTINATION/etc/group
 		done
 	}
 
@@ -61,7 +61,7 @@ else
 	usr+=('postgres:x:115:115::/usr/bin:/bin:/usr/sbin')
 	for u in ${usr[@]}; do
 		echo "Creating users $u"
-		sed -i '$ a $u' $DESTINATION/etc/passwd
+		sed -i "$ a $u" $DESTINATION/etc/passwd
 		done
 	} 
 
@@ -71,3 +71,4 @@ else
 
 addgroups
 adduser
+symlinks
