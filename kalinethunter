@@ -17,7 +17,7 @@ pre_cleanup() {
 } 
 
 post_cleanup() {
-	find $HOME -name "kalifs*" -type f -delete && find $HOME -name "proot*" -type f -delete
+	find $HOME -name "kalifs*" -type f -exec rm -rf {} \;
 } 
 
 		# Get patched proot binary for aarch64
@@ -36,7 +36,7 @@ post_cleanup() {
 #####################
 
 setchroot() {
-	chroot=full
+	chroot=minimal
 }
 unknownarch() {
 	printf "$red"
