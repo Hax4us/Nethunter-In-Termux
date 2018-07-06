@@ -157,7 +157,11 @@ clear
 #		exit
 #		fi
 #		fi
-[ `pwd` = $HOME ] || printf "$red You are not in home :($reset" && exit 2
+# Dont run in non-home
+if [ `pwd` != $HOME ]; then
+printf "$red You are not in home :($reset"
+exit 2
+fi
 printf "\n${yellow} You are going to install Kali Nethunter In Termux Without Root ;) Cool\n\n"
 pre_cleanup
 checksysinfo
