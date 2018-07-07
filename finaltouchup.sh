@@ -38,6 +38,7 @@ else
 	fi
 	grps+=('rtkit:x:111')
 	grps+=('pulse:x:111')
+	grps+=('geoclue:x:113')
 
 	for g in ${grps[@]}; do
 		echo "Creating groups $g"
@@ -59,6 +60,7 @@ else
 	usr+=('messagebus:x:106:110::/var/run/dbus:/usr/sbin/nologin')
 	fi
 	usr+=('postgres:x:115:115::/usr/bin:/bin:/usr/sbin')
+	usr+=('geoclue:x:113:113::/usr/bin:/bin:/usr/sbin')
 	for u in ${usr[@]}; do
 		echo "Creating users $u"
 		sed -i "$ a $u" $DESTINATION/etc/passwd
