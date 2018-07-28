@@ -39,7 +39,7 @@ else
 	grps+=('rtkit:x:111')
 	grps+=('pulse:x:111')
 	grps+=('geoclue:x:113')
-
+        grps+=('
 	for g in ${grps[@]}; do
 		echo "Creating groups $g"
 		sed -i "$ a $g" $DESTINATION/etc/group
@@ -71,6 +71,6 @@ else
 #    Main     #
 ###############
 
-addgroups
-adduser
-symlinks
+#addgroups
+#adduser
+#symlinks

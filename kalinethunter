@@ -22,12 +22,12 @@ post_cleanup() {
 
 		# Get patched proot binary for aarch64
 
-#proot_patch64() {
-#	echo && echo
-#		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot
-#			mv proot $PREFIX/bin
-#				chmod 777 $PREFIX/bin/proot
-#			}
+proot_patch() {
+	printf("\n\n")
+		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot
+			mv proot $PREFIX/bin
+				chmod +x $PREFIX/bin/proot
+			}
 
 # Utility function for Unknown Arch
 
@@ -166,6 +166,10 @@ printf "\n${yellow} You are going to install Kali Nethunter In Termux Without Ro
 pre_cleanup
 checksysinfo
 checkdeps
+if [ $(getprop ro.product.manufacturer) = HUAWEI -a $SETARCH = aarch64 ]
+then
+proot_patch
+fi
 setchroot
 gettarfile
 getsha
@@ -193,7 +197,7 @@ finalwork() {
 	axel -a https://github.com/Hax4us/Nethunter-In-Termux/raw/master/finaltouchup.sh
 	DESTINATION=$DESTINATION SETARCH=$SETARCH bash $HOME/finaltouchup.sh
 } 
-finalwork
+#finalwork
 
 printline
 printf "\n${yellow} Now you can enjoy Kali Nethuter in your Termux :)\n Don't forget to like my hard work for termux and many other things\n"
