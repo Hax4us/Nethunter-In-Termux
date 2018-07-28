@@ -24,7 +24,7 @@ post_cleanup() {
 
 proot_patch() {
 	printf("\n\n")
-		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/master/proot
+		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/beta/proot
 			mv proot $PREFIX/bin
 				chmod +x $PREFIX/bin/proot
 			}
