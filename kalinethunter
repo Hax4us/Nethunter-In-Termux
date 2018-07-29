@@ -166,7 +166,7 @@ printf "\n${yellow} You are going to install Kali Nethunter In Termux Without Ro
 pre_cleanup
 checksysinfo
 checkdeps
-if [ $(getprop ro.product.manufacturer) = HUAWEI -a $SETARCH = aarch64 ]
+if [ $(getprop ro.product.manufacturer) = HUAWEI -a $SETARCH = arm64 ]
 then
 proot_patch
 fi
