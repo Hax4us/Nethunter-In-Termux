@@ -27,7 +27,7 @@ proot_patch() {
 		axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/beta/proot
 			mv proot $PREFIX/bin
 				chmod +x $PREFIX/bin/proot
-				apk-mark hold proot 		
+				apt-mark hold proot 		
 	}
 
 # Utility function for Unknown Arch
