@@ -7,8 +7,8 @@ This is a script by which you can install Kali nethunter (Kali Linux) in your te
 4. Now just start kali nethunter `startkali`
 
 ### Compulsory Steps For First Time Use (Only for Fisrt Time After Installation)
-1. So after `startkali`, execute this command ` apt-key adv --keyserver hkp://keys.gnupg.net --recv-keys 7D8D0BF6 `
-2. Now its time to update `apt-get update `
+1. So after `startkali`, execute this command `wget https://http.kali.org/kali/pool/main/k/kali-archive-keyring/kali-archive-keyring_2018.1_all.deb`
+2. `apt install ./kali-archive-keyring_2018.1_all.deb`
 
 #### Here is guide to setup LXDE 
 https://www.hax4us.com/2018/07/how-to-install-lxde-in-kali-nethunter.html?m=1
