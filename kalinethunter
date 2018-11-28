@@ -13,11 +13,11 @@ reset='\033[0m'
 
 # Clean up
 pre_cleanup() {
-	find $HOME -name "kali*" -type d -exec rm -rf {} \;
+	find $HOME -name "kali*" -type d -exec rm -rf {} \; || :
 } 
 
 post_cleanup() {
-	find $HOME -name "kalifs*" -type f -exec rm -rf {} \;
+	find $HOME -name "kalifs*" -type f -exec rm -rf {} \; || :
 } 
 
 		# Get patched proot binary for aarch64
@@ -99,7 +99,7 @@ gettarfile() {
 	printf "$blue [*] Getting tar file...$reset\n\n"
 	DESTINATION=$HOME/kali-${SETARCH}
 	seturl $SETARCH
-	axel --alternate "$URL"
+	axel ${EXTRAARGS} --alternate "$URL"
 	rootfs="kalifs-${SETARCH}-${chroot}.tar.xz"
 }
 
@@ -107,7 +107,7 @@ gettarfile() {
 
 getsha() {
 	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
-	axel --alternate "https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${SETARCH}-${chroot}.sha512sum"
+	axel ${EXTRAARGS} --alternate "https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${SETARCH}-${chroot}.sha512sum"
 }
 
 # Utility function to check integrity
@@ -149,16 +149,18 @@ printline() {
 
 # Start
 clear
-#EXTRAARGS="default"
-#if [[ ! -z $1 ]]
-#	then
-#EXTRAARGS=$1
-#if [[ $EXTRAARGS = "uninstall" ]]
-#	then
-#		cleanup
-#		exit
-#		fi
-#		fi
+EXTRAARGS=""
+if [[ ! -z $1 ]]
+	then
+EXTRAARGS=$1
+if [[ $EXTRAARGS != "--insecure" ]]
+	then
+		
+		EXTRAARGS=""
+	
+	fi
+
+	fi
 # Dont run in non-home
 if [ `pwd` != $HOME ]; then
 printf "$red You are not in home :($reset"
