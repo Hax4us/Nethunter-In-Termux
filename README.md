@@ -10,6 +10,9 @@ This is a script by which you can install Kali nethunter (Kali Linux) in your te
 1. So after `startkali`, execute this command `wget https://http.kali.org/kali/pool/main/k/kali-archive-keyring/kali-archive-keyring_2018.1_all.deb`
 2. `apt install ./kali-archive-keyring_2018.1_all.deb`
 
+### In Case Of SSL error: certificate verify failed
+Rerun script with extra parameter `--insecure` or copy paste this command `./kalinethunter --insecure`
+
 #### Here is guide to setup LXDE 
 https://www.hax4us.com/2018/07/how-to-install-lxde-in-kali-nethunter.html?m=1
 
