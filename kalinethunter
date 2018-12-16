@@ -20,25 +20,6 @@ post_cleanup() {
 	find $HOME -name "kalifs*" -type f -exec rm -rf {} \; || :
 } 
 
-		# Get patched proot binary for aarch64
-
-#proot_patch() {
- #printf "\n\n"
-	#axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/beta/proot
-			#mv proot $PREFIX/bin
-				#chmod +x $PREFIX/bin/proot
-				#apt-mark hold proot 		
-	#}
-
-# Utility function for Unknown Arch
-
-#####################
-#    Decide Chroot  #
-#####################
-
-setchroot() {
-	chroot=minimal
-}
 unknownarch() {
 	printf "$red"
 	echo "[*] Unknown Architecture :("
@@ -90,24 +71,25 @@ checkdeps() {
 # URLs of all possibls architectures
 
 seturl() {
-	URL="https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${1}-${chroot}.tar.xz"
+	URL="https://github.com/Hax4us/Nethunter-In-Termux/raw/beta/rootfs/kali-rootfs-${SETARCH}.tar.gz"
 }
 
 # Utility function to get tar file
 
 gettarfile() {
-	printf "$blue [*] Getting tar file...$reset\n\n"
+	printf "$blue [*] Getting tar file ...$reset\n\n"
 	DESTINATION=$HOME/kali-${SETARCH}
+	mkdir $DESTINATION && cd $DESTINATION
 	seturl $SETARCH
 	axel ${EXTRAARGS} --alternate "$URL"
-	rootfs="kalifs-${SETARCH}-${chroot}.tar.xz"
+	rootfs="kali-rootfs-${SETARCH}.tar.gz"
 }
 
 # Utility function to get SHA
 
 getsha() {
 	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
-	axel ${EXTRAARGS} --alternate "https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${SETARCH}-${chroot}.sha512sum"
+	axel ${EXTRAARGS} --alternate "https://github.com/Hax4us/Nethunter-In-Termux/raw/beta/rootfs/${rootfs}.sha256sum"
 }
 
 # Utility function to check integrity
@@ -116,7 +98,7 @@ checkintegrity() {
 	printf "\n${blue} [*] Checking integrity of file...\n"
 	echo " [*] The script will immediately terminate in case of integrity failure"
 	printf ' '
-	sha512sum -c kalifs-${SETARCH}-${chroot}.sha512sum || {
+	sha512sum -c ${rootfs}.sha256sum || {
 		printf "$red Sorry :( to say your downloaded linux file was corrupted or half downloaded, but don't worry, just rerun my script\n${reset}"
 		exit 1
 	}
@@ -166,14 +148,10 @@ if [ `pwd` != $HOME ]; then
 printf "$red You are not in home :($reset"
 exit 2
 fi
-printf "\n${yellow} You are going to install Kali Nethunter In Termux Without Root ;) Cool\n\n"
+printf "\n${yellow} You are going to install Kali In Termux Without Root ;) Cool\n\n"
 pre_cleanup
 checksysinfo
 checkdeps
-#if [ $(getprop ro.product.manufacturer) = HUAWEI -a $SETARCH = arm64 ]
-#then
-#proot_patch
-#fi
 setchroot
 gettarfile
 getsha
@@ -184,27 +162,9 @@ post_cleanup
 
 printf "$blue [*] Configuring Kali For You ..."
 
-# Utility function for resolv.conf
-resolvconf() {
-	#create resolv.conf file 
-	printf "\nnameserver 8.8.8.8\nnameserver 8.8.4.4" > ${DESTINATION}/etc/resolv.conf
-} 
-resolvconf
-
-################
-# finaltouchup #
-################
-
-finalwork() {
-	[ -e $HOME/finaltouchup.sh ] && rm $HOME/finaltouchup.sh
-	echo
-	axel -a https://github.com/Hax4us/Nethunter-In-Termux/raw/master/finaltouchup.sh
-	DESTINATION=$DESTINATION SETARCH=$SETARCH bash $HOME/finaltouchup.sh
-} 
-#finalwork
-
 printline
-printf "\n${yellow} Now you can enjoy Kali Nethuter in your Termux :)\n Don't forget to like my hard work for termux and many other things\n"
+
+printf "\n${yellow} Now you can enjoy Kali Nethuter in your Termux :)\n Don't forget to subscribe my channel\n"
 printline
 printline
 printf "\n${blue} [∆] My official email:${yellow}		lkpandey950@gmail.com\n"
