@@ -17,7 +17,7 @@ pre_cleanup() {
 } 
 
 post_cleanup() {
-	find $HOME -name "kalifs*" -type f -exec rm -rf {} \; || :
+	find $DESTINATION -name "kali*" -type f -exec rm {} \; || :
 } 
 
 unknownarch() {
