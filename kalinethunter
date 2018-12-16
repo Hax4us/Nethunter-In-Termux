@@ -152,7 +152,6 @@ printf "\n${yellow} You are going to install Kali In Termux Without Root ;) Cool
 pre_cleanup
 checksysinfo
 checkdeps
-setchroot
 gettarfile
 getsha
 checkintegrity
