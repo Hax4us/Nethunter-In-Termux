@@ -90,7 +90,7 @@ checkdeps() {
 # URLs of all possibls architectures
 
 seturl() {
-	URL="https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${1}-${chroot}.tar.xz"
+	URL="https://build.nethunter.com/kalifs/kalifs-20190228/kalifs-${1}-${chroot}.tar.xz"
 }
 
 # Utility function to get tar file
@@ -107,7 +107,7 @@ gettarfile() {
 
 getsha() {
 	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
-	axel ${EXTRAARGS} --alternate "https://build.nethunter.com/kalifs/kalifs-20171013/kalifs-${SETARCH}-${chroot}.sha512sum"
+	axel ${EXTRAARGS} --alternate "https://build.nethunter.com/kalifs/kalifs-20190228/kalifs-${SETARCH}-${chroot}.sha512sum"
 }
 
 # Utility function to check integrity
