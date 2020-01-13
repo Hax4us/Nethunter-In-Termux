@@ -136,7 +136,7 @@ createloginfile() {
 	cat > $bin <<- EOM
 #!/data/data/com.termux/files/usr/bin/bash -e
 unset LD_PRELOAD
-exec proot --link2symlink -0 -r ${DESTINATION} -b /dev/ -b /sys/ -b /proc/ -b /storage/ -b $HOME -w $HOME /usr/bin/env -i HOME=/root USER=root TERM="$TERM" LANG=$LANG PATH=/bin:/usr/bin:/sbin:/usr/sbin /bin/bash --login
+exec proot --link2symlink -0 -r ${DESTINATION} -b /dev/ -b /sys/ -b /proc/ -b /sdcard -b $HOME -w $HOME /usr/bin/env -i HOME=/root USER=root TERM="$TERM" LANG=$LANG PATH=/bin:/usr/bin:/sbin:/usr/sbin /bin/bash --login
 EOM
 
 	chmod 700 $bin
