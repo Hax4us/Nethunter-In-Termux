@@ -1,76 +1,90 @@
 #!/data/data/com.termux/files/usr/bin/bash
 
-####################
-# Symlinks to true #
-####################
+fix_profile() {
+    if [ -f ${DESTINATION}/root/.bash_profile ]; then
+        sed -i '/if/,/fi/d' "${DESTINATION}/root/.bash_profile"
+    fi
+}
 
-symlinks() {
-sym=()
-sym+=('usr/sbin/groupadd')
-sym+=('usr/sbin/groupdel')
-sym+=('usr/bin/groups')
-sym+=('usr/sbin/useradd')
-sym+=('usr/sbin/usermod')
-sym+=('usr/sbin/userdel')
-sym+=('usr/bin/chage')
-sym+=('usr/bin/mesg')  
-sym+=('usr/bin/gpasswd')
-sym+=('usr/bin/chfn')
- for f in ${sym[@]};do
-  echo "Creating symlinks $f"
-  ln -sf ${DESTINATION}/bin/true ${DESTINATION}/${f}
-  done
-  }
+fix_sudo() {
+    chmod +s $DESTINATION/usr/bin/sudo
+    chmod +s $DESTINATION/usr/bin/su
+    echo "kali    ALL=(ALL:ALL) ALL" > $DESTINATION/etc/sudoers.d/kali
+    echo "Set disable_coredump false" > $DESTINATION/etc/sudo.conf
+}
 
-########################
-# Adding User & groups #
-########################
+fix_uid() {
+    GID=$(id -g)
+    startkali -r usermod -u $UID kali 2>/dev/null
+    startkali -r groupmod -g $GID kali 2>/dev/null
+}
 
-addgroups(){
-	grps=()
-	grps+=('ssl-cert:x:111')
-	grps+=('postgres:x:115')
-	if [ $SETARCH = armhf ]; then
-	grps+=('lightdm:x:111')
-	grps+=('messagebus:x:110')
-else
-	grps+=('lightdm:x:112')
-	fi
-	grps+=('rtkit:x:111')
-	grps+=('pulse:x:111')
-	grps+=('geoclue:x:113')
-        grps+=('
-	for g in ${grps[@]}; do
-		echo "Creating groups $g"
-		sed -i "$ a $g" $DESTINATION/etc/group
-		done
-	}
+create_xsession_handler() {
+    VNC_WRAPPER=$DESTINATION/usr/bin/vnc
+    cat > $VNC_WRAPPER <<- EOF
+#!/bin/bash
+    
+vnc_start() {
+    if [ ! -f ~/.vnc/passwd ]; then
+        vnc_passwd
+    fi
+    USR=\$(whoami)
+    if [ \$USR = "root" ]; then
+        SCR=:1
+    else
+        SCR=:2
+    fi
+    export USER=\$USR; LD_PRELOAD=/usr/lib/${SETARCH}-linux-gnu/libgcc_s.so.1 nohup vncserver \$SCR >/dev/null 2>&1 </dev/null
+}
 
-adduser() {
-	usr=()
-	usr+=('usbmux:x:108:46:Usbmux:/var/lib/usbmux:/bin/bash:/bin:/usr/sbin')
-	if [ $SETARCH = arm64 ]; then
-	usr+=('lightdm:x:107:112::/usr/bin:/usr/sbin:/bin')
-else
-	usr+=('lightdm:x:105:111:/usr/bin:/usr/sbin:/bin')
-	fi
-	usr+=('rtkit:x:111:111::/usr/bin/:/usr/sbin/:/bin')
-	usr+=('pulse:x:111:111::/usr/bin/:/usr/sbin:/bin')
-	if [ $SETARCH = armhf ]; then
-	usr+=('messagebus:x:106:110::/var/run/dbus:/usr/sbin/nologin')
-	fi
-	usr+=('postgres:x:115:115::/usr/bin:/bin:/usr/sbin')
-	usr+=('geoclue:x:113:113::/usr/bin:/bin:/usr/sbin')
-	for u in ${usr[@]}; do
-		echo "Creating users $u"
-		sed -i "$ a $u" $DESTINATION/etc/passwd
-		done
-	} 
+vnc_stop() {
+    vncserver -kill :1
+    vncserver -kill :2
+    return \$?
+}
 
-###############
-#    Main     #
-###############
+vnc_passwd() {
+    vncpasswd
+    return \$?
+}
 
-#addgroups
-#adduser
-#symlinks
+vnc_status() {
+    session_list=\$(vncserver -list)
+    if [[ \$session_list == *"590"* ]]; then
+        echo "\$session_list"
+    else
+        echo "there is nothing to list :)"
+        echo "you can start a new session by << vnc start >>"
+    fi
+}
+
+vnc_kill() {
+    pkill Xtigervnc
+    return \$?
+}
+
+case "\$1" in
+    start)
+        vnc_start
+        ;;
+    stop)
+        vnc_stop
+        ;;
+    status)
+        vnc_status
+        ;;
+    kill)
+        vnc_kill
+        ;;
+    *)
+        echo "[!] invalid input"
+esac
+EOF
+}
+
+## Main
+
+fix_profile
+fix_sudo
+fix_uid
+create_xsession_handler

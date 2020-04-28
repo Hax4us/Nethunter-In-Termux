@@ -20,16 +20,6 @@ post_cleanup() {
 	find $HOME -name "kalifs*" -type f -exec rm -rf {} \; || :
 } 
 
-		# Get patched proot binary for aarch64
-
-#proot_patch() {
- #printf "\n\n"
-	#axel --alternate https://github.com/Hax4us/Nethunter-In-Termux/raw/beta/proot
-			#mv proot $PREFIX/bin
-				#chmod +x $PREFIX/bin/proot
-				#apt-mark hold proot 		
-	#}
-
 # Utility function for Unknown Arch
 
 #####################
@@ -37,7 +27,7 @@ post_cleanup() {
 #####################
 
 setchroot() {
-	chroot=minimal
+	chroot=full
 }
 unknownarch() {
 	printf "$red"
@@ -90,7 +80,7 @@ checkdeps() {
 # URLs of all possibls architectures
 
 seturl() {
-	URL="https://build.nethunter.com/kalifs/kalifs-20190228/kalifs-${1}-${chroot}.tar.xz"
+	URL="https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.tar.xz"
 }
 
 # Utility function to get tar file
@@ -98,7 +88,8 @@ seturl() {
 gettarfile() {
 	printf "$blue [*] Getting tar file...$reset\n\n"
 	DESTINATION=$HOME/kali-${SETARCH}
-	seturl $SETARCH
+	seturl
+    cd $HOME
 	axel ${EXTRAARGS} --alternate "$URL"
 	rootfs="kalifs-${SETARCH}-${chroot}.tar.xz"
 }
@@ -107,7 +98,7 @@ gettarfile() {
 
 getsha() {
 	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
-	axel ${EXTRAARGS} --alternate "https://build.nethunter.com/kalifs/kalifs-20190228/kalifs-${SETARCH}-${chroot}.sha512sum"
+	axel ${EXTRAARGS} --alternate "https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.sha512sum"
 }
 
 # Utility function to check integrity
@@ -126,7 +117,7 @@ checkintegrity() {
 
 extract() {
 	printf "$blue [*] Extracting... $reset\n\n"
-	proot --link2symlink tar -xf $rootfs 2> /dev/null || :
+	proot --link2symlink tar -xf $rootfs -C $HOME 2> /dev/null || :
 }
 
 # Utility function for login file
@@ -136,7 +127,39 @@ createloginfile() {
 	cat > $bin <<- EOM
 #!/data/data/com.termux/files/usr/bin/bash -e
 unset LD_PRELOAD
-exec proot --link2symlink -0 -r ${DESTINATION} -b /dev/ -b /sys/ -b /proc/ -b /sdcard -b $HOME -w $HOME /usr/bin/env -i HOME=/root USER=root TERM="$TERM" LANG=$LANG PATH=/bin:/usr/bin:/sbin:/usr/sbin /bin/bash --login
+if [ ! -f $DESTINATION/root/.version ]; then
+    touch $DESTINATION/root/.version
+fi
+user=kali
+home="/home/\$user"
+LOGIN="sudo -u \$user /bin/bash"
+if [[ ("\$#" != "0" && ("\$1" == "-r")) ]]; then
+    user=root
+    home=/\$user
+    LOGIN="/bin/bash --login"
+    shift
+fi
+
+cmd="proot \\
+    --link2symlink \\
+    -0 \\
+    -r ${DESTINATION} \\
+    -b /dev \\
+    -b /proc \\
+    -b $DESTINATION\$home:/dev/shm \\
+    -b /sdcard \\
+    -b $HOME \\
+    -w \$home \\
+    /usr/bin/env -i \\
+    HOME=\$home TERM="\$TERM" \\
+    LANG=\$LANG PATH=/bin:/usr/bin:/sbin:/usr/sbin \\
+    \$LOGIN"
+
+args="\$@"
+if [ "\$#" == 0 ]; then
+    exec \$cmd
+else
+    \$cmd -c "\$args"
 EOM
 
 	chmod 700 $bin
@@ -144,7 +167,7 @@ EOM
 
 printline() {
 	printf "${blue}\n"
-	echo " #-----------------------------------------------#"
+	echo " #---------------------------------#"
 }
 
 # Start
@@ -161,19 +184,12 @@ if [[ $EXTRAARGS != "--insecure" ]]
 	fi
 
 	fi
-# Dont run in non-home
-if [ `pwd` != $HOME ]; then
-printf "$red You are not in home :($reset"
-exit 2
-fi
+
 printf "\n${yellow} You are going to install Kali Nethunter In Termux Without Root ;) Cool\n\n"
+
 pre_cleanup
 checksysinfo
 checkdeps
-#if [ $(getprop ro.product.manufacturer) = HUAWEI -a $SETARCH = arm64 ]
-#then
-#proot_patch
-#fi
 setchroot
 gettarfile
 getsha
@@ -201,14 +217,14 @@ finalwork() {
 	axel -a https://github.com/Hax4us/Nethunter-In-Termux/raw/master/finaltouchup.sh
 	DESTINATION=$DESTINATION SETARCH=$SETARCH bash $HOME/finaltouchup.sh
 } 
-#finalwork
+finalwork
 
 printline
 printf "\n${yellow} Now you can enjoy Kali Nethuter in your Termux :)\n Don't forget to like my hard work for termux and many other things\n"
 printline
 printline
-printf "\n${blue} [∆] My official email:${yellow}		lkpandey950@gmail.com\n"
-printf "$blue [∆] My website:${yellow}		https://hax4us.com\n"
-printf "$blue [∆] My YouTube channel:${yellow}	https://youtube.com/hax4us\n"
+printf "\n${blue} [*] My official email:${yellow}		lkpandey950@gmail.com\n"
+printf "$blue [*] My website:${yellow}		https://hax4us.com\n"
+printf "$blue [*] My YouTube channel:${yellow}	https://youtube.com/hax4us\n"
 printline
 printf "$reset"
