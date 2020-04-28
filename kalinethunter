@@ -161,7 +161,6 @@ if [ "\$#" == 0 ]; then
 else
     \$cmd -c "\$args"
 EOM
-
 	chmod 700 $bin
 }
 
@@ -173,17 +172,12 @@ printline() {
 # Start
 clear
 EXTRAARGS=""
-if [[ ! -z $1 ]]
-	then
-EXTRAARGS=$1
-if [[ $EXTRAARGS != "--insecure" ]]
-	then
-		
+if [[ ! -z $1 ]]; then
+    EXTRAARGS=$1
+    if [[ $EXTRAARGS != "--insecure" ]]; then
 		EXTRAARGS=""
-	
-	fi
-
-	fi
+    fi
+fi
 
 printf "\n${yellow} You are going to install Kali Nethunter In Termux Without Root ;) Cool\n\n"
 

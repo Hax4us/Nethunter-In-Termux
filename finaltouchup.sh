@@ -80,6 +80,7 @@ case "\$1" in
         echo "[!] invalid input"
 esac
 EOF
+chmod +x $VNC_WRAPPER
 }
 
 ## Main
