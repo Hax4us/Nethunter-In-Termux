@@ -90,15 +90,19 @@ gettarfile() {
 	DESTINATION=$HOME/kali-${SETARCH}
 	seturl
     cd $HOME
-	axel ${EXTRAARGS} --alternate "$URL"
-	rootfs="kalifs-${SETARCH}-${chroot}.tar.xz"
+    rootfs="kalifs-${SETARCH}-${chroot}.tar.xz"
+    if [ ! -f "$rootfs" ]; then
+        axel ${EXTRAARGS} --alternate "$URL"
+    else
+        printf "${red}[!] continuing with already downloaded image, if this image is corrupted or half downloaded then delete it manually to download a fresh image.$reset\n\n"
+    fi
 }
 
 # Utility function to get SHA
 
 getsha() {
 	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
-	axel ${EXTRAARGS} --alternate "https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.sha512sum"
+	axel ${EXTRAARGS} --alternate "https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.sha512sum" -o kalifs-${SETARCH}-${chroot}.sha512sum
 }
 
 # Utility function to check integrity
