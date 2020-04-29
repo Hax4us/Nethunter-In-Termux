@@ -160,6 +160,7 @@ if [ "\$#" == 0 ]; then
     exec \$cmd
 else
     \$cmd -c "\$args"
+fi
 EOM
 	chmod 700 $bin
 }
