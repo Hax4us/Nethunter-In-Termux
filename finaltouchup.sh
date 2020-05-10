@@ -20,6 +20,11 @@ fix_uid() {
 }
 
 create_xsession_handler() {
+    if [ $SETARCH = "arm64" ]; then
+        LIBGCCPATH=/usr/lib/aarch64-linux-gnu
+    else
+        LIBGCCPATH=/usr/lib/arm-linux-gnueabihf
+    fi
     VNC_WRAPPER=$DESTINATION/usr/bin/vnc
     cat > $VNC_WRAPPER <<- EOF
 #!/bin/bash
@@ -34,7 +39,7 @@ vnc_start() {
     else
         SCR=:2
     fi
-    export USER=\$USR; LD_PRELOAD=/usr/lib/${SETARCH}-linux-gnu/libgcc_s.so.1 nohup vncserver \$SCR >/dev/null 2>&1 </dev/null
+    export USER=\$USR; LD_PRELOAD=$LIBGCCPATH/libgcc_s.so.1 nohup vncserver \$SCR >/dev/null 2>&1 </dev/null
 }
 
 vnc_stop() {
