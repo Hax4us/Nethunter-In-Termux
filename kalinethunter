@@ -102,6 +102,9 @@ gettarfile() {
 
 getsha() {
 	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
+    if [ -f kalifs-${SETARCH}-${chroot}.sha512sum ]; then
+        rm kalifs-${SETARCH}-${chroot}.sha512sum
+    fi
 	axel ${EXTRAARGS} --alternate "https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.sha512sum" -o kalifs-${SETARCH}-${chroot}.sha512sum
 }
 
