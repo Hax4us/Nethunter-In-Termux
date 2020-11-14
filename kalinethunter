@@ -11,15 +11,6 @@ yellow='\033[1;33m'
 blue='\033[1;34m'
 reset='\033[0m'
 
-# Clean up
-pre_cleanup() {
-	find $HOME -name "kali*" -type d -exec rm -rf {} \; || :
-} 
-
-post_cleanup() {
-	find $HOME -name "kalifs*" -type f -exec rm -rf {} \; || :
-} 
-
 # Utility function for Unknown Arch
 
 #####################
