@@ -65,32 +65,5 @@ vnc_status() {
 
 vnc_kill() {
     pkill Xtigervnc
-    return \$?
-}
-
-case "\$1" in
-    start)
-        vnc_start
-        ;;
-    stop)
-        vnc_stop
-        ;;
-    status)
-        vnc_status
-        ;;
-    kill)
-        vnc_kill
-        ;;
-    *)
-        echo "[!] invalid input"
-esac
-EOF
-chmod +x $VNC_WRAPPER
-}
-
-## Main
-
-fix_profile
-fix_sudo
 fix_uid
 create_xsession_handler
