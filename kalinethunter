@@ -80,7 +80,7 @@ checkdeps() {
 # URLs of all possibls architectures
 
 seturl() {
-	URL="https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.tar.xz"
+	URL="https://kali.download/nethunter-images/kali-2022.1/rootfs/kalifs-arm64-full.tar.xz"
 }
 
 # Utility function to get tar file
@@ -105,7 +105,7 @@ getsha() {
     if [ -f kalifs-${SETARCH}-${chroot}.sha512sum ]; then
         rm kalifs-${SETARCH}-${chroot}.sha512sum
     fi
-	axel ${EXTRAARGS} --alternate "https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.sha512sum" -o kalifs-${SETARCH}-${chroot}.sha512sum
+	axel ${EXTRAARGS} --alternate "https://kali.download/nethunter-images/kali-2022.1/rootfs/kalifs-arm64-full.sha512sum" -o kalifs-${SETARCH}-${chroot}.sha512sum
 }
 
 # Utility function to check integrity
