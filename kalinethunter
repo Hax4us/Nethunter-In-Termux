@@ -105,7 +105,7 @@ getsha() {
     if [ -f kalifs-${SETARCH}-${chroot}.sha512sum ]; then
         rm kalifs-${SETARCH}-${chroot}.sha512sum
     fi
-	axel ${EXTRAARGS} --alternate "https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.sha512sum" -o kalifs-${SETARCH}-${chroot}.sha512sum
+	axel ${EXTRAARGS} --alternate "https://kali.download/nethunter-images/current/rootfs/kalifs-${SETARCH}-${chroot}.sha512sum" -o kalifs-${SETARCH}-${chroot}.sha512sum
 }
 
 # Utility function to check integrity
