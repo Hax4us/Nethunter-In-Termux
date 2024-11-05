@@ -42,10 +42,10 @@ checksysinfo() {
 	printf "$blue [*] Checking host architecture ..."
 	case $(getprop ro.product.cpu.abi) in
 		arm64-v8a)
-			SETARCH=arm64
+			setarch=arm64
 			;;
 		armeabi|armeabi-v7a)
-			SETARCH=armhf
+			setarch=armhf
 			;;
 		*)
 			unknownarch
@@ -78,19 +78,25 @@ checkdeps() {
 }
 
 # URLs of all possibls architectures
+# Setting a transient URL for the Kali repo
+
+kali_repo_url="https://kali.download/nethunter-images/current/rootfs/"
+# kali-nethunter-rootfs-full-arm64.tar.xz
+dist="kali-nethunter-rootfs"
 
 seturl() {
-	URL="https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.tar.xz"
+	#URL="https://images.kali.org/nethunter/kalifs-${setarch}-${chroot}.tar.xz"
+	URL="${kali_repo_url}${dist}-${chroot}-${setarch}.tar.xz"
 }
 
 # Utility function to get tar file
 
 gettarfile() {
 	printf "$blue [*] Getting tar file...$reset\n\n"
-	DESTINATION=$HOME/kali-${SETARCH}
+	DESTINATION=$HOME/kali-${setarch}
 	seturl
     cd $HOME
-    rootfs="kalifs-${SETARCH}-${chroot}.tar.xz"
+    rootfs="${dist}-${chroot}-${setarch}.tar.xz"
     if [ ! -f "$rootfs" ]; then
         axel ${EXTRAARGS} --alternate "$URL"
     else
@@ -102,10 +108,11 @@ gettarfile() {
 
 getsha() {
 	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
-    if [ -f kalifs-${SETARCH}-${chroot}.sha512sum ]; then
-        rm kalifs-${SETARCH}-${chroot}.sha512sum
+    if [ -f ${dist}-${chroot}-${setarch}.tar.xz.sha512sum ]; then
+        rm ${dist}-${chroot}-${setarch}.tar.xz.sha512sum
     fi
-	axel ${EXTRAARGS} --alternate "https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.sha512sum" -o kalifs-${SETARCH}-${chroot}.sha512sum
+	#axel ${EXTRAARGS} --alternate "https://images.kali.org/nethunter/kalifs-${setarch}-${chroot}.sha512sum" -o kalifs-${setarch}-${chroot}.sha512sum
+	axel ${EXTRAARGS} --alternate "${kali_repo_url}${dist}-${chroot}-${setarch}.tar.xz.sha512sum" -o ${dist}-${chroot}-${setarch}.tar.xz.sha512sum
 }
 
 # Utility function to check integrity
@@ -114,7 +121,7 @@ checkintegrity() {
 	printf "\n${blue} [*] Checking integrity of file...\n"
 	echo " [*] The script will immediately terminate in case of integrity failure"
 	printf ' '
-	sha512sum -c kalifs-${SETARCH}-${chroot}.sha512sum || {
+	sha512sum -c ${dist}-${chroot}-${setarch}.tar.xz.sha512sum || {
 		printf "$red Sorry :( to say your downloaded linux file was corrupted or half downloaded, but don't worry, just rerun my script\n${reset}"
 		exit 1
 	}
@@ -124,7 +131,8 @@ checkintegrity() {
 
 extract() {
 	printf "$blue [*] Extracting... $reset\n\n"
-	proot --link2symlink tar -xf $rootfs -C $HOME 2> /dev/null || :
+  printf "$red Destination: ${DESTINATION} $reset\n\n"
+	proot --link2symlink tar -C $HOME --strip-components=1 -xf $rootfs 2> /dev/null || :
 }
 
 # Utility function for login file
@@ -217,7 +225,7 @@ finalwork() {
 	[ -e $HOME/finaltouchup.sh ] && rm $HOME/finaltouchup.sh
 	echo
 	axel -a https://github.com/Hax4us/Nethunter-In-Termux/raw/master/finaltouchup.sh
-	DESTINATION=$DESTINATION SETARCH=$SETARCH bash $HOME/finaltouchup.sh
+	DESTINATION=$DESTINATION setarch=$setarch bash $HOME/finaltouchup.sh
 } 
 finalwork
 
