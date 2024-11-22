@@ -35,8 +35,7 @@ setchroot() {
 #    SETARCH        #
 #####################
 unknownarch() {
-	printf "${red}"
-	echo " [*] Unknown Architecture :("
+	printf "${red} [*] Unknown Architecture :("
 	printf "\n${reset}"
 	exit
 }
@@ -57,21 +56,19 @@ checksysinfo() {
 
 # Check if required packages are present
 checkdeps() {
-	printf "${blue}\n"
-	echo " [*] Updating apt cache..."
+	printf "\n${blue} [*] Updating apt cache..."
 	apt update -y &> /dev/null
-	echo " [*] Checking for all required tools..."
+	echo "\n [*] Checking for all required tools..."
 
 	for i in proot tar axel; do
 		if [ -e $PREFIX/bin/$i ]; then
-			echo "  • ${i} is OK"
+			echo "\n  • ${i} is OK"
 		else
-			echo "Installing ${i}..."
+			echo "\nInstalling ${i}..."
 			apt install -y $i || 
                         {
-				printf "${red}"
-				echo " ERROR: check your internet connection or apt"
-				printf "\n Exiting...${reset}"
+				printf "\n${red} ERROR: check your internet connection or apt"
+				printf "\n Exiting...${reset}\n"
 				exit
 			}
 		fi
@@ -87,18 +84,18 @@ seturl() {
 # Utility function to get tar file
 gettarfile() {
     seturl
-    printf "$blue} [*] Fetching tar file"
+    printf "\n$blue} [*] Fetching tar file"
     printf "\n from ${URL}"
     cd $HOME
     rootfs="kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz"
-    printf " [*] Placing ${rootfs}"
-    DESTINATION=$HOME/chroot/kali-${SETARCH}
+    printf "\n [*] Placing ${rootfs}"
+    DESTINATION=$HOME/chroot/kali-$SETARCH
     printf "\n into {$DESTINATION}"
     printf "${reset}\n"
     if [ ! -f "$rootfs" ]; then
         axel ${EXTRAARGS} --alternate "$URL"
     else
-        printf "${red} [!] continuing with already downloaded image,
+        printf "${red} [!] continuing with already downloaded image,"
         printf "\n if this image is corrupted or half downloaded then "
         printf "\n delete it manually to download a fresh image."
         printf "${reset}\n"
@@ -107,7 +104,7 @@ gettarfile() {
 
 # Utility function to get SHA
 getsha() {
-	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
+	printf "\n${blue} [*] Getting SHA ... $reset\n"
     if [ -f kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum ]; then
         rm kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum
     fi
@@ -123,8 +120,8 @@ checkintegrity() {
 	printf "${reset}\n"
 	sha512sum -c $rootfs.sha512sum || \\
         {
-		printf "${red} Sorry :( to say your downloaded linux file was corrupted 
-                printf "\n or half downloaded, but don't worry, just rerun my script"
+		printf "${red} Sorry :( to say your downloaded linux file was corrupted"
+                printf "\n or half downloaded, but don'''t worry, just rerun my script"
                 printf "${reset}\n"
 		exit 1
 	}
@@ -142,8 +139,8 @@ extract() {
 
 # Utility function for login file
 createloginfile() {
-	bin=${PREFIX}/bin/startkali
-        printf "${blue} [*] Creating ${bin}"
+	bin=$PREFIX/bin/startkali.sh
+        printf "\n${blue} [*] Creating ${bin}"
         printf "${reset}\n"
 	cat > $bin <<- EOM
 #!/data/data/com.termux/files/usr/bin/bash -e
@@ -166,7 +163,7 @@ unknownarch() {
 
 # Utility function for detect system
 checksysinfo() {
-	printf "$blue [*] Checking host architecture ..."
+	printf "\n$blue [*] Checking host architecture ..."
 	case $(getprop ro.product.cpu.abi) in
 		arm64-v8a)
 			SETARCH=arm64;;
@@ -217,7 +214,7 @@ EOM
 }
 
 printline() {
-	printf "${blue}\n"
+	printf "\n${blue}"
 	echo " #---------------------------------#"
 }
 
@@ -232,8 +229,7 @@ if [[ ! -z $1 ]]; then
 fi
 
 printf "\n${yellow} You are going to install Kali Nethunter"
-printf "\n In Termux Without Root ;) 
-printf "Cool\n"
+printf "\n In Termux Without Root ;) Cool"
 
 pre_cleanup
 checksysinfo
@@ -246,7 +242,7 @@ extract
 createloginfile
 post_cleanup
 
-printf "${blue} [*] Configuring Kali For You ..."
+printf "\n${blue} [*] Configuring Kali For You ..."
 
 # Utility function for resolv.conf
 resolvconf() {
@@ -268,7 +264,8 @@ finalwork() {
 finalwork
 
 printline
-printf "\n${yellow} Now you can enjoy Kali Nethuter in your Termux :)\n Don't forget to like my hard work for termux and many other things\n"
+printf "\n${yellow} Now you can enjoy Kali Nethuter in your Termux :)"
+printf "\n Don't forget to like my hard work for termux and many other things"
 printline
 printline
 printf "\n${blue} [*] My official email:${yellow} lkpandey950@gmail.com"
