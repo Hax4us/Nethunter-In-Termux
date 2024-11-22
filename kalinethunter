@@ -13,11 +13,11 @@ reset='\033[0m'
 
 # Clean up
 pre_cleanup() {
-	find $HOME -name "kali*" -type d -exec rm -rf {} \; || :
-} 
+        find $HOME -name "kali*" -type d -exec rm -rf {} \; || :
+}
 
 post_cleanup() {
-	find $HOME -name "kalifs*" -type f -exec rm -rf {} \; || :
+        find $HOME -name "kali*" -type f -exec rm -rf {} \; || :
 } 
 
 # Utility function for Unknown Arch
@@ -42,14 +42,11 @@ checksysinfo() {
 	printf "$blue [*] Checking host architecture ..."
 	case $(getprop ro.product.cpu.abi) in
 		arm64-v8a)
-			SETARCH=arm64
-			;;
+			SETARCH=arm64;;
 		armeabi|armeabi-v7a)
-			SETARCH=armhf
-			;;
+			SETARCH=armhf;;
 		*)
-			unknownarch
-			;;
+			unknownarch;;
 	esac
 }
 
@@ -78,19 +75,17 @@ checkdeps() {
 }
 
 # URLs of all possibls architectures
-
 seturl() {
-	URL="https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.tar.xz"
+	URL="https://kali.download/nethunter-images/current/rootfs/kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz"
 }
 
 # Utility function to get tar file
-
 gettarfile() {
-	printf "$blue [*] Getting tar file...$reset\n\n"
-	DESTINATION=$HOME/kali-${SETARCH}
-	seturl
+    printf "$blue [*] Getting tar file...$reset\n\n"
+    DESTINATION=$HOME/chroot/kali-${SETARCH}
+    seturl
     cd $HOME
-    rootfs="kalifs-${SETARCH}-${chroot}.tar.xz"
+    rootfs="kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz"
     if [ ! -f "$rootfs" ]; then
         axel ${EXTRAARGS} --alternate "$URL"
     else
@@ -99,36 +94,32 @@ gettarfile() {
 }
 
 # Utility function to get SHA
-
 getsha() {
 	printf "\n${blue} [*] Getting SHA ... $reset\n\n"
-    if [ -f kalifs-${SETARCH}-${chroot}.sha512sum ]; then
-        rm kalifs-${SETARCH}-${chroot}.sha512sum
+    if [ -f kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum ]; then
+        rm kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum
     fi
-	axel ${EXTRAARGS} --alternate "https://images.kali.org/nethunter/kalifs-${SETARCH}-${chroot}.sha512sum" -o kalifs-${SETARCH}-${chroot}.sha512sum
+	axel ${EXTRAARGS} --alternate "https://kali.download/nethunter-images/current/rootfs/kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum" -o kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum
 }
 
 # Utility function to check integrity
-
 checkintegrity() {
 	printf "\n${blue} [*] Checking integrity of file...\n"
 	echo " [*] The script will immediately terminate in case of integrity failure"
 	printf ' '
-	sha512sum -c kalifs-${SETARCH}-${chroot}.sha512sum || {
+	sha512sum -c kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum || {
 		printf "$red Sorry :( to say your downloaded linux file was corrupted or half downloaded, but don't worry, just rerun my script\n${reset}"
 		exit 1
 	}
 }
 
 # Utility function to extract tar file
-
 extract() {
 	printf "$blue [*] Extracting... $reset\n\n"
 	proot --link2symlink tar -xf $rootfs -C $HOME 2> /dev/null || :
 }
 
 # Utility function for login file
-
 createloginfile() {
 	bin=${PREFIX}/bin/startkali
 	cat > $bin <<- EOM
@@ -138,11 +129,11 @@ if [ ! -f $DESTINATION/root/.version ]; then
     touch $DESTINATION/root/.version
 fi
 user=kali
-home="/home/\$user"
+home="$HOME/\$user"
 LOGIN="sudo -u \$user /bin/bash"
 if [[ ("\$#" != "0" && ("\$1" == "-r")) ]]; then
     user=root
-    home=/\$user
+    home=$HOME/\$user
     LOGIN="/bin/bash --login"
     shift
 fi
@@ -159,7 +150,8 @@ cmd="proot \\
     -w \$home \\
     /usr/bin/env -i \\
     HOME=\$home TERM="\$TERM" \\
-    LANG=\$LANG PATH=/bin:/usr/bin:/sbin:/usr/sbin \\
+    LANG=\$LANG \\
+    PATH=/bin:$PREFIX/bin:/sbin:$PREFIX/sbin:$PREFIX\etc \\
     \$LOGIN"
 
 args="\$@"
@@ -205,7 +197,7 @@ printf "$blue [*] Configuring Kali For You ..."
 # Utility function for resolv.conf
 resolvconf() {
 	#create resolv.conf file 
-	printf "\nnameserver 8.8.8.8\nnameserver 8.8.4.4" > ${DESTINATION}/etc/resolv.conf
+	printf "\nameserver 8.8.8.8\nameserver 8.8.4.4" > ${DESTINATION}/etc/resolv.conf
 } 
 resolvconf
 
