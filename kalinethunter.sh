@@ -30,15 +30,18 @@ post_cleanup() {
 setchroot() {
 	chroot=full
 }
+
+#####################
+#    SETARCH        #
+#####################
 unknownarch() {
-	printf "$red"
-	echo "[*] Unknown Architecture :("
-	printf "$reset"
+	printf "${red}"
+	echo " [*] Unknown Architecture :("
+	printf "\n${reset}"
 	exit
 }
 
 # Utility function for detect system
-
 checksysinfo() {
 	printf "$blue [*] Checking host architecture ..."
 	case $(getprop ro.product.cpu.abi) in
@@ -49,10 +52,10 @@ checksysinfo() {
 		*)
 			unknownarch;;
 	esac
+        printf "\n [*] SETARCH = ${SETARCH}"
 }
 
 # Check if required packages are present
-
 checkdeps() {
 	printf "${blue}\n"
 	echo " [*] Updating apt cache..."
@@ -61,13 +64,14 @@ checkdeps() {
 
 	for i in proot tar axel; do
 		if [ -e $PREFIX/bin/$i ]; then
-			echo "  • $i is OK"
+			echo "  • ${i} is OK"
 		else
 			echo "Installing ${i}..."
-			apt install -y $i || {
-				printf "$red"
-				echo " ERROR: check your internet connection or apt\n Exiting..."
-				printf "$reset"
+			apt install -y $i || 
+                        {
+				printf "${red}"
+				echo " ERROR: check your internet connection or apt"
+				printf "\n Exiting...${reset}"
 				exit
 			}
 		fi
@@ -82,15 +86,22 @@ seturl() {
 
 # Utility function to get tar file
 gettarfile() {
-    printf "$blue [*] Getting tar file...$reset\n\n"
-    DESTINATION=$HOME/chroot/kali-${SETARCH}
     seturl
+    printf "$blue} [*] Fetching tar file"
+    printf "\n from ${URL}"
     cd $HOME
     rootfs="kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz"
+    printf " [*] Placing ${rootfs}"
+    DESTINATION=$HOME/chroot/kali-${SETARCH}
+    printf "\n into {$DESTINATION}"
+    printf "${reset}\n"
     if [ ! -f "$rootfs" ]; then
         axel ${EXTRAARGS} --alternate "$URL"
     else
-        printf "${red}[!] continuing with already downloaded image, if this image is corrupted or half downloaded then delete it manually to download a fresh image.$reset\n\n"
+        printf "${red} [!] continuing with already downloaded image,
+        printf "\n if this image is corrupted or half downloaded then "
+        printf "\n delete it manually to download a fresh image."
+        printf "${reset}\n"
     fi
 }
 
@@ -100,41 +111,81 @@ getsha() {
     if [ -f kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum ]; then
         rm kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum
     fi
-	axel ${EXTRAARGS} --alternate "https://kali.download/nethunter-images/current/rootfs/kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum" -o kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum
+	axel ${EXTRAARGS} 
+             --alternate "${URL}.sha512sum" \\
+             -o $rootfs.sha512sum
 }
 
 # Utility function to check integrity
 checkintegrity() {
-	printf "\n${blue} [*] Checking integrity of file...\n"
-	echo " [*] The script will immediately terminate in case of integrity failure"
-	printf ' '
-	sha512sum -c kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum || {
-		printf "$red Sorry :( to say your downloaded linux file was corrupted or half downloaded, but don't worry, just rerun my script\n${reset}"
+	printf "\n${blue} [*] Checking integrity of file..."
+	prinf "\n [*] The script will immediately terminate in case of integrity failure"
+	printf "${reset}\n"
+	sha512sum -c $rootfs.sha512sum || \\
+        {
+		printf "${red} Sorry :( to say your downloaded linux file was corrupted 
+                printf "\n or half downloaded, but don't worry, just rerun my script"
+                printf "${reset}\n"
 		exit 1
 	}
 }
 
 # Utility function to extract tar file
 extract() {
-	printf "$blue [*] Extracting... $reset\n\n"
-	proot --link2symlink tar -xf $rootfs -C $HOME 2> /dev/null || :
+	printf "\n${blue} [*] Extracting ${rootfs}"
+        printf "\n into ${DESTINATION}"
+        printf "${reset}\n"
+	proot --link2symlink \\
+              tar -xf $rootfs \\
+              -C $HOME 2> /dev/null || :
 }
 
 # Utility function for login file
 createloginfile() {
 	bin=${PREFIX}/bin/startkali
+        printf "${blue} [*] Creating ${bin}"
+        printf "${reset}\n"
 	cat > $bin <<- EOM
 #!/data/data/com.termux/files/usr/bin/bash -e
 unset LD_PRELOAD
+
+# colors
+red='\033[1;31m'
+yellow='\033[1;33m'
+blue='\033[1;34m'
+reset='\033[0m'
+
+#####################
+#    SETARCH        #
+#####################
+unknownarch() {
+	printf "\n${red} [*] Unknown Architecture :("
+	printf "${reset}\n"
+	exit
+}
+
+# Utility function for detect system
+checksysinfo() {
+	printf "$blue [*] Checking host architecture ..."
+	case $(getprop ro.product.cpu.abi) in
+		arm64-v8a)
+			SETARCH=arm64;;
+		armeabi|armeabi-v7a)
+			SETARCH=armhf;;
+		*)
+			unknownarch;;
+	esac
+        printf "\n [*] SETARCH = ${SETARCH}"
+}
 if [ ! -f $DESTINATION/root/.version ]; then
     touch $DESTINATION/root/.version
 fi
 user=kali
-home="$HOME/\$user"
+home=$DESTINATION/home/$user
 LOGIN="sudo -u \$user /bin/bash"
 if [[ ("\$#" != "0" && ("\$1" == "-r")) ]]; then
     user=root
-    home=$HOME/\$user
+    home=$DESTINATION/$user
     LOGIN="/bin/bash --login"
     shift
 fi
@@ -145,21 +196,21 @@ cmd="proot \\
     -r ${DESTINATION} \\
     -b /dev \\
     -b /proc \\
-    -b $DESTINATION\$home:/dev/shm \\
+    -b ${DESTINATION}/dev:/dev/shm \\
     -b /sdcard \\
-    -b $HOME \\
-    -w \$home \\
-    /usr/bin/env -i \\
-    HOME=\$home TERM="\$TERM" \\
-    LANG=\$LANG \\
-    PATH=/bin:$PREFIX/bin:/sbin:$PREFIX/sbin:$PREFIX\etc \\
-    \$LOGIN"
+    -b ${HOME} \\
+    -w ${home} \\
+    ${PREFIX}/bin/env -i \\
+    HOME=${home} TERM=${TERM} \\
+    LANG=${LANG} \\
+    PATH=${DESTINATION}/bin:${home}/bin:${DESTINATION}/sbin:${home}/sbin:${DESTINATION}\etc:${home}/bin \\
+    ${LOGIN}"
 
-args="\$@"
-if [ "\$#" == 0 ]; then
-    exec \$cmd
+args="${@}"
+if [ "${#}" == 0 ]; then
+    exec $cmd
 else
-    \$cmd -c "\$args"
+    $cmd -c "${args}"
 fi
 EOM
 	chmod 700 $bin
@@ -180,7 +231,9 @@ if [[ ! -z $1 ]]; then
     fi
 fi
 
-printf "\n${yellow} You are going to install Kali Nethunter In Termux Without Root ;) Cool\n\n"
+printf "\n${yellow} You are going to install Kali Nethunter"
+printf "\n In Termux Without Root ;) 
+printf "Cool\n"
 
 pre_cleanup
 checksysinfo
@@ -193,12 +246,12 @@ extract
 createloginfile
 post_cleanup
 
-printf "$blue [*] Configuring Kali For You ..."
+printf "${blue} [*] Configuring Kali For You ..."
 
 # Utility function for resolv.conf
 resolvconf() {
 	#create resolv.conf file 
-	printf "\nnameserver 8.8.8.8\nnameserver 8.8.4.4" > ${DESTINATION}/etc/resolv.conf
+	printf "\nnameserver 8.8.8.8\nnameserver 8.8.4.4" > $DESTINATION/etc/resolv.conf
 } 
 resolvconf
 
@@ -218,8 +271,8 @@ printline
 printf "\n${yellow} Now you can enjoy Kali Nethuter in your Termux :)\n Don't forget to like my hard work for termux and many other things\n"
 printline
 printline
-printf "\n${blue} [*] My official email:${yellow}		lkpandey950@gmail.com\n"
-printf "$blue [*] My website:${yellow}		https://hax4us.com\n"
-printf "$blue [*] My YouTube channel:${yellow}	https://youtube.com/hax4us\n"
+printf "\n${blue} [*] My official email:${yellow} lkpandey950@gmail.com"
+printf "\n${blue} [*] My website:${yellow} https://hax4us.com"
+printf "\n${blue} [*] My YouTube channel:${yellow} https://youtube.com/hax4us"
 printline
-printf "$reset"
+printf "${reset}\n"
