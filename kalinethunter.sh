@@ -146,35 +146,6 @@ createloginfile() {
 	cat > $bin <<- EOM
 #!/data/data/com.termux/files/usr/bin/bash -e
 unset LD_PRELOAD
-
-# colors
-red='\033[1;31m'
-yellow='\033[1;33m'
-blue='\033[1;34m'
-reset='\033[0m'
-
-#####################
-#    SETARCH        #
-#####################
-unknownarch() {
-	printf "\n${red} [*] Unknown Architecture :("
-	printf "${reset}\n"
-	exit
-}
-
-# Utility function for detect system
-checksysinfo() {
-	printf "\n$blue [*] Checking host architecture ..."
-	case $(getprop ro.product.cpu.abi) in
-		arm64-v8a)
-			SETARCH=arm64;;
-		armeabi|armeabi-v7a)
-			SETARCH=armhf;;
-		*)
-			unknownarch;;
-	esac
-        printf "\n [*] SETARCH = ${SETARCH}"
-}
 if [ ! -f $DESTINATION/root/.version ]; then
     touch $DESTINATION/root/.version
 fi
