@@ -17,7 +17,7 @@ This is a script by which you can install Kali nethunter (Kali Linux) in your te
 
 
 ### In Case Of SSL error: certificate verify failed
-Rerun script with extra parameter `--insecure` or copy paste this command `./kalinethunter --insecure`
+Rerun script with extra parameter `--insecure` or copy paste this command `./kalinethunter.sh --insecure`
 
 #### setup LXDE 
 Default __DESKTOP__ is _XFCE4_ but you can setup __LXDE__ also https://www.hax4us.com/2018/07/how-to-install-lxde-in-kali-nethunter.html?m=1
