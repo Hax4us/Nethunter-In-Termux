@@ -84,13 +84,13 @@ seturl() {
 # Utility function to get tar file
 gettarfile() {
     seturl
-    printf "\n$blue} [*] Fetching tar file"
+    printf "\n${blue} [*] Fetching tar file"
     printf "\n from ${URL}"
     cd $HOME
     rootfs="kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz"
     printf "\n [*] Placing ${rootfs}"
     DESTINATION=$HOME/chroot/kali-$SETARCH
-    printf "\n into {$DESTINATION}"
+    printf "\n into ${DESTINATION}"
     printf "${reset}\n"
     if [ ! -f "$rootfs" ]; then
         axel ${EXTRAARGS} --alternate "$URL"
@@ -110,7 +110,7 @@ getsha() {
         rm kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum
     fi
 	axel ${EXTRAARGS} \
-             --alternate "${URL}.sha512sum" \\
+             --alternate "${URL}.sha512sum" \
              -o $rootfs.sha512sum
 }
 
@@ -119,8 +119,8 @@ checkintegrity() {
 	printf "\n${blue} [*] Checking integrity of file..."
 	printf "\n [*] The script will immediately terminate in case of integrity failure"
 	printf "${reset}\n"
-	sha512sum -c $rootfs.sha512sum || \\
-        {
+	sha512sum -c $rootfs.sha512sum || \
+    {
 		printf "${red} Sorry :( to say your downloaded linux file was corrupted"
                 printf "\n or half downloaded, but don'''t worry, just rerun my script"
                 printf "${reset}\n"
@@ -133,14 +133,14 @@ extract() {
 	printf "\n${blue} [*] Extracting ${rootfs}"
         printf "\n into ${DESTINATION}"
         printf "${reset}\n"
-	proot --link2symlink \\
-              tar -xf $rootfs \\
+	proot --link2symlink \
+              tar -xf $rootfs \
               -C $HOME 2> /dev/null || :
 }
 
 # Utility function for login file
 createloginfile() {
-	bin=$PREFIX/bin/startkali.sh
+	bin=$PREFIX/bin/startkali
         printf "\n${blue} [*] Creating ${bin}"
         printf "${reset}\n"
 	cat > $bin <<- EOM
@@ -179,11 +179,11 @@ if [ ! -f $DESTINATION/root/.version ]; then
     touch $DESTINATION/root/.version
 fi
 user=kali
-home=$DESTINATION/home/$user
+home=/home/\$user
 LOGIN="sudo -u \$user /bin/bash"
 if [[ ("\$#" != "0" && ("\$1" == "-r")) ]]; then
     user=root
-    home=$DESTINATION/$user
+    home=/\$user
     LOGIN="/bin/bash --login"
     shift
 fi
@@ -197,18 +197,18 @@ cmd="proot \\
     -b ${DESTINATION}/dev:/dev/shm \\
     -b /sdcard \\
     -b ${HOME} \\
-    -w ${home} \\
-    ${PREFIX}/bin/env -i \\
-    HOME=${home} TERM=${TERM} \\
-    LANG=${LANG} \\
-    PATH=${DESTINATION}/bin:${home}/bin:${DESTINATION}/sbin:${home}/sbin:${DESTINATION}\etc:${home}/bin \\
-    ${LOGIN}"
+    -w \$home \\
+    /usr/bin/env -i \\
+    HOME=\$home TERM=\$TERM \\
+    LANG=\$LANG \\
+    PATH=/bin:/usr/bin:/sbin:/usr/sbin \\
+	\$LOGIN"
 
-args="${@}"
-if [ "${#}" == 0 ]; then
-    exec $cmd
+args="\$@"
+if [ "\$#" == 0 ]; then
+    exec \$cmd
 else
-    $cmd -c "${args}"
+    \$cmd -c "\$args"
 fi
 EOM
 	chmod 700 $bin
@@ -230,7 +230,7 @@ if [[ ! -z $1 ]]; then
 fi
 
 printf "\n${yellow} You are going to install Kali Nethunter"
-printf "\n In Termux Without Root ;) Cool"
+printf "\n In Termux Without Root ;) Cool\n"
 
 pre_cleanup
 checksysinfo
