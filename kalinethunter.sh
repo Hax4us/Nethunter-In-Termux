@@ -58,13 +58,13 @@ checksysinfo() {
 checkdeps() {
 	printf "\n${blue} [*] Updating apt cache..."
 	apt update -y &> /dev/null
-	echo "\n [*] Checking for all required tools..."
+	echo -e "\n [*] Checking for all required tools..."
 
 	for i in proot tar axel; do
 		if [ -e $PREFIX/bin/$i ]; then
-			echo "\n  • ${i} is OK"
+			echo -e "\n  • ${i} is OK"
 		else
-			echo "\nInstalling ${i}..."
+			echo -e "\nInstalling ${i}..."
 			apt install -y $i || 
                         {
 				printf "\n${red} ERROR: check your internet connection or apt"
@@ -104,11 +104,12 @@ gettarfile() {
 
 # Utility function to get SHA
 getsha() {
+	seturl
 	printf "\n${blue} [*] Getting SHA ... $reset\n"
     if [ -f kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum ]; then
         rm kali-nethunter-rootfs-${chroot}-${SETARCH}.tar.xz.sha512sum
     fi
-	axel ${EXTRAARGS} 
+	axel ${EXTRAARGS} \
              --alternate "${URL}.sha512sum" \\
              -o $rootfs.sha512sum
 }
@@ -116,7 +117,7 @@ getsha() {
 # Utility function to check integrity
 checkintegrity() {
 	printf "\n${blue} [*] Checking integrity of file..."
-	prinf "\n [*] The script will immediately terminate in case of integrity failure"
+	printf "\n [*] The script will immediately terminate in case of integrity failure"
 	printf "${reset}\n"
 	sha512sum -c $rootfs.sha512sum || \\
         {
