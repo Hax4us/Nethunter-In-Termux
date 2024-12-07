@@ -27,6 +27,7 @@ Err:1 http://kali.download/kali kali-rolling InRelease
 ```
 
 The missing key would be `ED444FF07D8D0BF6`
+
 2. Add key to keyserver `sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com --recv-keys ED444FF07D8D0BF6`
 Just change the final part to the key you found missing
 
